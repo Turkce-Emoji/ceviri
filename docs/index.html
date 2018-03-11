@@ -525,7 +525,7 @@ function oneriUpdate(oneriobj) {
    $oneri.html(`${oneri} <div class="user" data-uid=${oneriobj.key}> 
     </div><div class="sukular ${sukufied ? 'sukulu' : ''}" title="Oy ver"> <b>${sukular}</b>
         <svg class="icon icon-heart"><use xlink:href="#icon-heart"></use></svg>
-        </div>`)
+        </div>${deleteStr}`)
     $oneri.prependTo($oneriyeri.find('.messages'));
  getUserInfo(oneriobj.key).then(user => { if(!user) return; $(`.user[data-uid=${user.key}]`).html(`
             <img class="mini-avatar" src="${
