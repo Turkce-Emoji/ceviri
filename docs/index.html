@@ -544,7 +544,7 @@ db.child(`/oneriler/${emojikodu}`).on('child_removed', removedOneri => {
         return;
     }
 
-    $oneriyeri.find(`.messages [data-mesaj-id=${removedOneri.key}]`).remove();
+    $oneriyeri.find(`.messages [data-oneri-id=${removedOneri.key}]`).remove();
 });
 }
 
