@@ -516,7 +516,7 @@ function oneriUpdate(oneriobj) {
    var sukufied = auth.currentUser ? oneriobj.child('sukucular').hasChild(auth.currentUser.uid) : false;
    var $oneri = $oneriyeri.find(`.messages [data-oneri-uid = ${oneriobj.key}]`).length ? $oneriyeri.find(`.messages [data-oneri-uid = ${oneriobj.key}]`) : $(`<div data-oneri-uid=${oneriobj.key} data-emojicode=${emojikodu}> </div>`)
  
- const deleteStr = auth.currentUser && mesajobj.uid == auth.currentUser.uid ? `
+ const deleteStr = auth.currentUser && oneriobj.uid == auth.currentUser.uid ? `
 <div class="delete" title="Sil" onclick="db.child(\'/oneriler/${emojikodu}/${auth.currentUser.uid}\').set(null)">
     <svg class="icon icon-bin2">
         <use xlink:href="#icon-bin2"></use>
