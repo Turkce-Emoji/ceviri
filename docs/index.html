@@ -536,6 +536,16 @@ function oneriUpdate(oneriobj) {
         
 db.child(`/oneriler/${emojikodu}`).on('child_added', oneriUpdate);
 db.child(`/oneriler/${emojikodu}`).on('child_changed', oneriUpdate);
+db.child(`/oneriler/${emojikodu}`).on('child_removed', removedOneri => {
+    if (!$oneriyeri.get(0).parentNode) {
+        db.child(`/oneriler/${emojikodu}`).off('child_added');
+        db.child(`/oneriler/${emojikodu}`).off('child_changed');
+         db.child(`/oneriler/${emojikodu}`).off('child_removed');
+        return;
+    }
+
+    $oneriyeri.find(`.messages [data-mesaj-id=${removedOneri.key}]`).remove();
+});
 }
 
 
