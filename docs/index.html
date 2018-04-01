@@ -122,27 +122,29 @@
         font-size: 16px;
     }
 
-    .list li{
+    .list li {
         position: relative;
     }
 
-    
-    .list li>label>.gosterge{
+
+    .list li>label>.gosterge {
         position: absolute;
         padding: 2px 5px;
         min-height: 24px;
         min-width: 20px;
         border-radius: 7px;
         bottom: 0px;
-       
+
     }
-     .list li>label>.gosterge.oneri{
+
+    .list li>label>.gosterge.oneri {
         background-color: #E91E63;
         left: 10px;
     }
-    .list li>label>.gosterge.tartisma{
-     background-color: #9C27B0;
-     right: 15px;
+
+    .list li>label>.gosterge.tartisma {
+        background-color: #9C27B0;
+        right: 15px;
     }
 
     .backdrop {
@@ -362,6 +364,22 @@
         display: flex;
         justify-content: center;
     }
+
+    .fetched::-webkit-scrollbar{
+    width: 10px;
+    }
+    .fetched::scrollbar{
+        width: 30px;
+    }
+
+    .fetched::-webkit-scrollbar-track {
+        background-color: rgba(0,0,0,0.1);
+    }
+
+    .fetched::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.3);
+    width: 12px;
+    }
 </style>
 
 <body>
@@ -415,7 +433,7 @@
         return array;
     }
 
- var db = firebase.database().ref('/');
+    var db = firebase.database().ref('/');
 
     window.onload = function () {
 
@@ -425,8 +443,13 @@
         var cevirilist = $('.list>ul');
         var ceviri = '__';
         var emojiArray = arrayifyWithKeys(emojione.emojioneList);
-
-
+        var gostergeQueue = [];
+        
+        async function gostergeQueueStart(){
+            var done = await gostergeQueue[0]();
+            if(done) gostergeQueue.splice(0,1);
+            if(gostergeQueue.length) gostergeQueueStart();
+        }
 
         $('.list').pagination({
             dataSource: emojiArray,
@@ -471,22 +494,27 @@
 `
                     ).appendTo(cevirilist);
                     $el.find('img').Lazy();
-
-                     db.child(`/oneriler/${emojikodu}/`).once('value').then(function(oneriler){
-                $el.find('.gosterge.oneri').text(oneriler.numChildren());
-            });
-              db.child(`/tartisma/${emojikodu}/`).once('value').then(function(tartisma){
-                $el.find('.gosterge.tartisma').text(tartisma.numChildren());
-            });
-  });
-
+                    gostergeQueue.push(function () {
+                        return new Promise(function(gostergeResolve, rej){
+                            Promise.all([
+                                db.child(`/oneriler/${emojikodu}/`).once('value'),
+                                db.child(`/tartisma/${emojikodu}/`).once('value')
+                            ]).then(([oneriler, tartisma]) => {
+                                $el.find('.gosterge.oneri').text(oneriler.numChildren());
+                                $el.find('.gosterge.tartisma').text(tartisma.numChildren());
+                                gostergeResolve(true);
+                            });
+                        }).catch((err) => log(err));
+                    });
+                });
+            gostergeQueueStart();
             }
         });
     }
 
 
- function loadOneriVeTartisma(liElement, emojikodu){
-         var $tartismayeri = $(liElement).find('.tartisma-yeri');
+    function loadOneriVeTartisma(liElement, emojikodu) {
+        var $tartismayeri = $(liElement).find('.tartisma-yeri');
         $tartismayeri.find('*').remove();
         $(`<div class="text-loading"> </div>`).appendTo($tartismayeri);
         $tartismayeri.addClass('fetched').find('*').remove();
@@ -543,7 +571,7 @@
 
         // öneriler
 
-  var $oneriyeri = $(liElement).find('.oneri-yeri');
+        var $oneriyeri = $(liElement).find('.oneri-yeri');
         $oneriyeri.find('*').remove();
         $(`<div class="text-loading"> </div>`).appendTo($oneriyeri);
         $oneriyeri.addClass('fetched').find('*').remove();
